@@ -27,8 +27,25 @@ class Lagrange(BaseModel):
         return self.points.T[1]
     
     def l(self, i: int, x: np.float64) -> np.float64:
+        """Базисный полином
+
+        Args:
+            i (int): Номер точки
+            x (np.float64): Произвольное x
+
+        Returns:
+            np.float64: Значение для x в точке i
+        """
         x_i = self.x[i]
         return np.prod([(x - x_j) / (x_i - x_j) for j, x_j in enumerate(self.x) if j != i], dtype=np.float64)
     
     def L(self, x: np.float64) -> np.float64:
+        """Полином Лагранжа
+
+        Args:
+            x (np.float64): Произвольное x
+
+        Returns:
+            np.float64: Интерполированное значение L(x)
+        """
         return np.sum([y * self.l(i, x) for i, y in enumerate(self.y)])
