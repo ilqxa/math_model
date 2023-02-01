@@ -1,18 +1,18 @@
 import numpy as np
+import numpy.typing as npt
 from pydantic import BaseModel, validator
 
 from validators.observations import *
 
 
 class Lagrange(BaseModel):
-    points: np.ndarray
+    points: npt.NDArray[np.float64]
 
     class Config:
         arbitrary_types_allowed = True
     
     _paired_points = validator('points', allow_reuse=True)(check_pairs)
     _difference_x = validator('points', allow_reuse=True)(check_unique_x)
-    _floated_points = validator('points', allow_reuse=True)(check_float_dtype)
         
     @property
     def n(self) -> int:
