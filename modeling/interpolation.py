@@ -1,6 +1,8 @@
 import numpy as np
 from pydantic import BaseModel, validator
 
+from validators.observations import *
+
 
 class Lagrange(BaseModel):
     points: np.ndarray
@@ -8,22 +10,9 @@ class Lagrange(BaseModel):
     class Config:
         arbitrary_types_allowed = True
     
-    @validator('points')
-    def points_must_be_pairs(cls, v: np.ndarray):
-        if v.ndim != 2: raise Exception('Data must have 2 dimensions')
-        if v.shape[1] != 2: raise Exception('Point must have 2 coordinates')
-        return v
-
-    @validator('points')
-    def x_must_be_difference(cls, v: np.ndarray):
-        if np.unique(v.T[0], return_counts=True)[-1].max() > 1:
-            raise Exception('Each X value must be unique')
-        return v
-        
-    @validator('points')
-    def points_must_be_float(cls, v: np.ndarray):
-        if v.dtype != np.float64: raise TypeError('Points must be defined by float')
-        return v
+    _paired_points = validator('points', allow_reuse=True)(check_pairs)
+    _difference_x = validator('points', allow_reuse=True)(check_unique_x)
+    _floated_points = validator('points', allow_reuse=True)(check_float_dtype)
         
     @property
     def n(self) -> int:
